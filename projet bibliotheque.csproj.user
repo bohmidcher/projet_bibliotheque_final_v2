@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="AddAuthorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Controls\ElegantButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Controls\GradientPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Forms\AddAuthorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AuthorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\BookForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\LoanForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\MemberForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="HomeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="RegisterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Views\AuthorsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Views\BooksView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Views\HistoryView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Views\LoansView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Views\MembersView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

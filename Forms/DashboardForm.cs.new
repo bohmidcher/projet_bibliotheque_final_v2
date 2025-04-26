@@ -1,0 +1,245 @@
+using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using projet_bibliotheque.Controls;
+using projet_bibliotheque.Models;
+using projet_bibliotheque.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace projet_bibliotheque.Forms
+{
+    public class DashboardForm : Form
+    {
+        private Member currentUser;
+        private Panel mainPanel;
+        private Panel sidebarPanel;
+        private Panel contentPanel;
+        
+        // Couleurs de l'application
+        private readonly Color PrimaryColor = Color.FromArgb(8, 15, 40);  // Bleu foncé
+        private readonly Color AccentColor = Color.FromArgb(45, 20, 80);  // Violet foncé
+        private readonly Color TextColor = Color.White;
+        private readonly Color SidebarColor = Color.FromArgb(20, 30, 70);
+        private readonly Color BackgroundColor = Color.WhiteSmoke;
+        
+        // Statistiques
+        private int totalUsers = 7265;
+        private int totalBooks = 3671;
+        private int newUsers = 156;
+        private int activeStudents = 2318;
+        
+        // Variations (en pourcentage)
+        private float usersVariation = 11.01f;
+        private float booksVariation = -0.13f;
+        private float newUsersVariation = 15.03f;
+        private float activeStudentsVariation = 6.08f;
+        
+        public DashboardForm(Member user = null)
+        {
+            this.currentUser = user;
+            InitializeComponent();
+            SetupForm();
+            CreateDashboard();
+        }
+        
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(1200, 800);
+            this.Name = "DashboardForm";
+            this.Text = "BiblioHub - Tableau de bord";
+            this.ResumeLayout(false);
+        }
+        
+        private void SetupForm()
+        {
+            this.Text = "BiblioHub - Tableau de bord";
+            this.MinimumSize = new Size(1200, 800);
+            this.Size = new Size(1200, 800);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.DoubleBuffered = true;
+        }
+        private void CreateDashboard()
+    {
+        // Créer le layout principal
+        TableLayoutPanel mainLayout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 2,
+            RowCount = 1,
+            BackColor = Color.White
+        };
+        
+        // Configurer les colonnes (sidebar et contenu principal)
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 220F));
+        mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        
+        // Créer la sidebar
+        sidebarPanel = new Panel
+        {
+            Dock = DockStyle.Fill,
+            BackColor = SidebarColor
+        };
+        
+        // Créer le contenu principal
+        contentPanel = new Panel
+        {
+            Dock = DockStyle.Fill,
+            BackColor = BackgroundColor,
+            Padding = new Padding(20)
+        };
+        
+        // Ajouter les panels au layout
+        mainLayout.Controls.Add(sidebarPanel, 0, 0);
+        mainLayout.Controls.Add(contentPanel, 1, 0);
+        
+        // Ajouter le layout au formulaire
+        this.Controls.Add(mainLayout);
+        
+        // Créer les éléments de la sidebar
+        CreateSidebar();
+        
+        // Créer le contenu du tableau de bord
+        CreateDashboardContent();
+    }
+    
+        private void CreateDashboardContent()
+        {
+        // Titre du tableau de bord avec le nom de l'utilisateur
+        Label lblWelcome = new Label
+        {
+            Text = "Bienvenue, " + (currentUser != null ? currentUser.Name : "Ahmed") + " !",
+            Font = new Font("Poppins", 18, FontStyle.Regular),
+            ForeColor = PrimaryColor,
+            Location = new Point(30, 30),
+            AutoSize = true
+        };
+        
+        // Sous-titre
+        Label lblDashboardTitle = new Label
+        {
+            Text = "Tableau de bord :",
+            Font = new Font("Poppins", 24, FontStyle.Bold),
+            ForeColor = PrimaryColor,
+            Location = new Point(30, lblWelcome.Bottom),
+            AutoSize = true
+        };
+        
+        // Ajouter les contrôles au panel de contenu
+        contentPanel.Controls.Add(lblWelcome);
+        contentPanel.Controls.Add(lblDashboardTitle);
+        
+        // Créer les cartes de statistiques
+        CreateStatCards();
+        
+        // Créer les sections pour les graphiques
+        CreateCharts();
+    }
+    
+        private void CreateStatCards()
+        {
+        // Définir les dimensions des cartes
+        int cardWidth = 180;
+        int cardHeight = 120;
+        int cardSpacing = 20;
+        int startY = 100;
+        int startX = 30;
+        
+        // Créer les cartes de statistiques
+        CreateStatCard("Utilisateurs", totalUsers.ToString("N0"), usersVariation, startX, startY, cardWidth, cardHeight, Color.FromArgb(52, 152, 219));
+        CreateStatCard("Livres empruntés", totalBooks.ToString("N0"), booksVariation, startX + cardWidth + cardSpacing, startY, cardWidth, cardHeight, Color.FromArgb(231, 76, 60));
+        CreateStatCard("Nouveaux Utilisateurs", newUsers.ToString("N0"), newUsersVariation, startX + (cardWidth + cardSpacing) * 2, startY, cardWidth, cardHeight, Color.FromArgb(46, 204, 113));
+        CreateStatCard("Étudiants Actifs", activeStudents.ToString("N0"), activeStudentsVariation, startX + (cardWidth + cardSpacing) * 3, startY, cardWidth, cardHeight, Color.FromArgb(155, 89, 182));
+    }
+    
+        private void CreateStatCard(string title, string value, float variation, int x, int y, int width, int height, Color color)
+        {
+        // Créer le panel principal de la carte
+        Panel cardPanel = new Panel
+        {
+            Size = new Size(width, height),
+            Location = new Point(x, y),
+            BackColor = Color.White,
+            BorderStyle = BorderStyle.None
+        };
+        
+        // Ajouter une ombre et des coins arrondis
+        cardPanel.Paint += (s, e) =>
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            using (var path = RoundedRectangle(new Rectangle(0, 0, cardPanel.Width, cardPanel.Height), 10))
+            {
+                using (var brush = new SolidBrush(Color.White))
+                {
+                    e.Graphics.FillPath(brush, path);
+                }
+            }
+        };
+        
+        // Titre de la statistique
+        Label lblTitle = new Label
+        {
+            Text = title,
+            Font = new Font("Poppins", 12, FontStyle.Regular),
+            ForeColor = Color.Gray,
+            Location = new Point(15, 15),
+            AutoSize = true
+        };
+        
+        // Valeur de la statistique
+        Label lblValue = new Label
+        {
+            Text = value,
+            Font = new Font("Poppins", 24, FontStyle.Bold),
+            ForeColor = PrimaryColor,
+            Location = new Point(15, 45),
+            AutoSize = true
+        };
+        
+        // Variation
+        string variationText = variation >= 0 ? "+" + variation.ToString("0.00") + "%" : variation.ToString("0.00") + "%";
+        Label lblVariation = new Label
+        {
+            Text = variationText,
+            Font = new Font("Poppins", 10, FontStyle.Regular),
+            ForeColor = variation >= 0 ? Color.Green : Color.Red,
+            Location = new Point(15, 80),
+            AutoSize = true
+        };
+        
+        // Icône de tendance (flèche vers le haut ou vers le bas)
+        PictureBox iconTrend = new PictureBox
+        {
+            Size = new Size(15, 15),
+            SizeMode = PictureBoxSizeMode.Zoom,
+            BackColor = Color.Transparent,
+            Location = new Point(lblVariation.Right + 5, lblVariation.Top + 2)
+        };
+        
+        // Ajouter une ligne de couleur en haut de la carte
+        Panel colorBar = new Panel
+        {
+            Size = new Size(width, 5),
+            Location = new Point(0, 0),
+            BackColor = color
+        };
+        
+        // Ajouter les contrôles à la carte
+        cardPanel.Controls.Add(lblTitle);
+        cardPanel.Controls.Add(lblValue);
+        cardPanel.Controls.Add(lblVariation);
+        cardPanel.Controls.Add(iconTrend);
+        cardPanel.Controls.Add(colorBar);
+        
+        // Ajouter la carte au panel de contenu
+        contentPanel.Controls.Add(cardPanel);
+    }
+}
